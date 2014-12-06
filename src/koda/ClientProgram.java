@@ -1,6 +1,5 @@
 package koda;
 
-import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,7 +16,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -120,6 +118,7 @@ public class ClientProgram extends Listener {
 	
 	private static void connectToServer(String username, String password) throws Exception {
 		client = new Client();
+		client.setName(username);
 		registerPackets();
 		client.start();
 		InetAddress address = client.discoverHost(udpPort, 5000);
@@ -132,7 +131,7 @@ public class ClientProgram extends Listener {
 		//client.connect(5000, ip, tcpPort, udpPort);
 		client.addListener(new ClientProgram());
 		
-		client.setName(username);
+		
 		
 		LoginMessage login = new LoginMessage();
 		login.username = username;
@@ -152,8 +151,10 @@ public class ClientProgram extends Listener {
 			break;
 		case LoginResponse.LOGIN_BAD_PASSWORD:
 			JOptionPane.showMessageDialog(frame, response.message, "Login", JOptionPane.ERROR_MESSAGE);
+			response = null;
+			client.close();
 			resetLoginFields();
-			break;
+			return;
 		}
 		
 		
@@ -171,10 +172,6 @@ public class ClientProgram extends Listener {
 		scan.close();
 		
 		System.exit(0);
-	}
-	
-	private static void showDialog(String message, String title, int messageType) {
-		JOptionPane.showMessageDialog(null, message, title, messageType);
 	}
 	
 	private static void resetLoginFields() {
