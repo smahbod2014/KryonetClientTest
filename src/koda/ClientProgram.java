@@ -35,7 +35,7 @@ import com.esotericsoftware.kryonet.Listener;
 public class ClientProgram extends Listener {
 
 	static Client client;
-	//static String ip = "128.54.228.219";
+	static String ip = "128.54.226.135";
 	static int tcpPort = 27960;
 	static int udpPort = 27961;
 	
@@ -140,14 +140,21 @@ public class ClientProgram extends Listener {
 		client.setName(username);
 		registerPackets();
 		client.start();
-		InetAddress address = client.discoverHost(udpPort, 5000);
-		if (address == null) {
-			JOptionPane.showMessageDialog(frame, "No server currently running", "No server", JOptionPane.ERROR_MESSAGE);
-			resetLoginFields();
-			return;
+		
+		if (ip == "") {
+			InetAddress address = client.discoverHost(udpPort, 5000);
+			if (address == null) {
+				JOptionPane.showMessageDialog(frame, "No server currently running", "No server", JOptionPane.ERROR_MESSAGE);
+				resetLoginFields();
+				return;
+			}
+			
+			client.connect(5000, address, tcpPort, udpPort);
+		} else {
+			client.connect(5000, ip, tcpPort, udpPort);
 		}
 		
-		client.connect(5000, address, tcpPort, udpPort);
+		
 		//client.connect(5000, ip, tcpPort, udpPort);
 		client.addListener(new ClientProgram());
 		
